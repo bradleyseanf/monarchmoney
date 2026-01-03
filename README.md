@@ -1,11 +1,7 @@
-<div style="background:#ffeb3b; padding:12px 14px; border-radius:10px; border:1px solid rgba(0,0,0,0.15); margin-bottom:16px;">
-  <strong>⚠️ Fork Notice:</strong>
-  This repository is a fork of
-  <a href="https://github.com/hammem/monarchmoney">hammem/monarchmoney</a>.
-  The upstream repository is no longer maintained.
-  <br><br>
-  <strong>This fork:</strong> fixes authentication issues that prevented persistent sessions from working reliably for extended periods of time, and is actively maintained going forward.
-</div>
+<p align="center">
+  <img src=".github/assets/fork-notice.svg" alt="Fork notice banner" />
+</p>
+
 
 # Monarch Money
 

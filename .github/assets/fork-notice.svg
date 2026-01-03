@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="140" viewBox="0 0 1200 140">
+  <rect x="8" y="8" width="1184" height="124" rx="14" fill="#FFEB3B" stroke="#111827" stroke-width="2"/>
+  <text x="40" y="52" font-family="Segoe UI, Roboto, Arial, sans-serif" font-size="30" font-weight="700" fill="#111827">
+    ⚠ Fork Notice
+  </text>
+  <text x="40" y="84" font-family="Segoe UI, Roboto, Arial, sans-serif" font-size="20" fill="#111827">
+    Fork of hammem/monarchmoney (upstream no longer maintained).
+  </text>
+  <text x="40" y="112" font-family="Segoe UI, Roboto, Arial, sans-serif" font-size="20" fill="#111827">
+    This fork fixes auth/persistent sessions and is actively maintained.
+  </text>
+</svg>
