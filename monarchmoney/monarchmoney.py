@@ -156,7 +156,6 @@ class MonarchMoney(object):
         """
         await self._multi_factor_authenticate(email, password, code, trusted_device)
 
-
     async def _upload_form_data(self, url: str, data: FormData) -> dict:
         """
         Retrieves the response from the server for a given URL and form data.
@@ -2904,7 +2903,6 @@ class MonarchMoney(object):
         with open(filename, "wb") as fh:
             pickle.dump(session_data, fh)
 
-
     def load_session(self, filename: Optional[str] = None) -> None:
         """
         Loads pre-existing auth token from a Python pickle file.
@@ -2928,64 +2926,64 @@ class MonarchMoney(object):
             os.remove(filename)
 
     async def _login_user(
-      self, email: str, password: str, mfa_secret_key: Optional[str]
+        self, email: str, password: str, mfa_secret_key: Optional[str]
     ) -> None:
-      """
-      Performs the initial login to a Monarch Money account.
-      Requires/persists only the long-lived login token (NOT the 1-hour features JWT).
-      """
-      data = {
-          "password": password,
-          "supports_mfa": True,
-          "trusted_device": True,
-          "username": email,
-      }
-      if mfa_secret_key:
-          data["totp"] = oathtool.generate_otp(mfa_secret_key)
+        """
+        Performs the initial login to a Monarch Money account.
+        Requires/persists only the long-lived login token (NOT the 1-hour features JWT).
+        """
+        data = {
+            "password": password,
+            "supports_mfa": True,
+            "trusted_device": True,
+            "username": email,
+        }
+        if mfa_secret_key:
+            data["totp"] = oathtool.generate_otp(mfa_secret_key)
 
-      async with ClientSession(headers=self._headers) as session:
-          async with session.post(
-              MonarchMoneyEndpoints.getLoginEndpoint(), json=data
-          ) as resp:
-              if resp.status == 403:
-                  # Server demands MFA
-                  raise RequireMFAException("Multi-Factor Auth Required")
-              if resp.status != 200:
-                  # Surface server message if present
-                  try:
-                      response = await resp.json()
-                      if "detail" in response:
-                          raise LoginFailedException(response["detail"])
-                      if "error_code" in response:
-                          raise LoginFailedException(response["error_code"])
-                      raise LoginFailedException(f"Unrecognized error: {response}")
-                  except Exception:
-                      raise LoginFailedException(
-                          f"HTTP Code {resp.status}: {resp.reason}"
-                      )
+        async with ClientSession(headers=self._headers) as session:
+            async with session.post(
+                MonarchMoneyEndpoints.getLoginEndpoint(), json=data
+            ) as resp:
+                if resp.status == 403:
+                    # Server demands MFA
+                    raise RequireMFAException("Multi-Factor Auth Required")
+                if resp.status != 200:
+                    # Surface server message if present
+                    try:
+                        response = await resp.json()
+                        if "detail" in response:
+                            raise LoginFailedException(response["detail"])
+                        if "error_code" in response:
+                            raise LoginFailedException(response["error_code"])
+                        raise LoginFailedException(f"Unrecognized error: {response}")
+                    except Exception:
+                        raise LoginFailedException(
+                            f"HTTP Code {resp.status}: {resp.reason}"
+                        )
 
-              response = await resp.json()
-              tok = response.get("token")
-              tokexp = response.get("tokenExpiration")
+                response = await resp.json()
+                tok = response.get("token")
+                tokexp = response.get("tokenExpiration")
 
-              if not tok:
-                  raise LoginFailedException("Login succeeded but no token returned.")
-              # Reject 1-hour features/Ably JWTs (they look like header.payload.signature)
-              if isinstance(tok, str) and tok.count(".") == 2:
-                  raise LoginFailedException(
-                      "Received a JWT-style token (likely 1-hour features token). "
-                      "Refusing to save; ensure we are using /auth/login/ token."
-                  )
-              # Long-lived browser-style sessions come with tokenExpiration == null
-              if tokexp not in (None, "null"):
-                  raise LoginFailedException(
-                      f"Short-lived token returned (tokenExpiration={tokexp}). "
-                      "Retry with trusted_device=True or complete MFA as trusted device."
-                  )
+                if not tok:
+                    raise LoginFailedException("Login succeeded but no token returned.")
+                # Reject 1-hour features/Ably JWTs (they look like header.payload.signature)
+                if isinstance(tok, str) and tok.count(".") == 2:
+                    raise LoginFailedException(
+                        "Received a JWT-style token (likely 1-hour features token). "
+                        "Refusing to save; ensure we are using /auth/login/ token."
+                    )
+                # Long-lived browser-style sessions come with tokenExpiration == null
+                if tokexp not in (None, "null"):
+                    raise LoginFailedException(
+                        f"Short-lived token returned (tokenExpiration={tokexp}). "
+                        "Retry with trusted_device=True or complete MFA as trusted device."
+                    )
 
-              self.set_token(tok)
-              self._headers["Authorization"] = f"Token {self._token}"
-        
+                self.set_token(tok)
+                self._headers["Authorization"] = f"Token {self._token}"
+
     async def _multi_factor_authenticate(
         self,
         email: str,
