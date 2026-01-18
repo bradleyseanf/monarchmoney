@@ -2,16 +2,14 @@
   <img src=".github/assets/monarch-logo.svg" alt="Monarch Money Community logo" />
 </p>
 
-<blockquote style="border-left:4px solid #f1c40f; margin:16px 0; padding:8px 12px;">
-  <span style="color:#f1c40f;">&#9888;</span> <strong>Warning</strong><br />
-  This project was forked from https://github.com/hammem/monarchmoney and would not be possible without it.
-  The upstream fork is no longer maintained. This fork fixes issues that prevent the library from working today, including the Monarch Money domain change to `api.monarch.com`, auth persistence, and the `get_budget()` GraphQL query.
-  Moving forward, please report issues here.
-</blockquote>
+> [!WARNING]
+> This project was forked from https://github.com/hammem/monarchmoney and would not be possible without it.
+> The upstream fork is no longer maintained. This fork fixes issues that prevent the library from working today, including the Monarch Money domain change to `api.monarch.com`, auth persistence, and the `get_budget()` GraphQL query.
+> Moving forward, please report issues here.
 
 # Monarch Money Community
 
-Python library for accessing [Monarch Money](https://www.monarchmoney.com/referral/ngam2i643l) data.
+Python library for accessing [Monarch Money](https://www.monarchmoney.com) data.
 
 # Installation
 
@@ -65,7 +63,7 @@ except RequireMFAException:
         await mm.multi_factor_authenticate(email, password, multi_factor_code)
 ```
 
-Alternatively, you can provide the MFA Secret Key. The MFA Secret Key is found when setting up the MFA in Monarch Money by going to Settings -> Security -> Enable MFA -> and copy the "Two-factor text code". Then provide it in the login() method:
+Alternatively, you can provide the MFA Secret Key. The MFA Secret Key is found when setting up the MFA in Monarch Money by going to Settings -> Security -> Enable MFA -> and copy the `Two-factor text code`. Then provide it in the login() method:
 ```python
 from monarchmoney import MonarchMoney, RequireMFAException
 
@@ -144,7 +142,7 @@ As of writing this README, the following methods are supported:
 - `update_transaction_splits` - modifies how a transaction is split (or not)
 - `create_transaction_tag` - creates a tag for transactions
 - `set_transaction_tags` - sets the tags on a transaction
-- `set_budget_amount` - sets a budget's value to the given amount (date allowed, will only apply to month specified by default). A zero amount value will "unset" or "clear" the budget for the given category.
+- `set_budget_amount` - sets a budget's value to the given amount (date allowed, will only apply to month specified by default). A zero amount value will `unset` or `clear` the budget for the given category.
 - `create_manual_account` - creates a new manual account
 - `delete_account` - deletes an account by the provided account id
 - `update_account` - updates settings and/or balance of the provided account id
@@ -154,12 +152,7 @@ As of writing this README, the following methods are supported:
 
 Any and all contributions -- code, documentation, feature requests, feedback -- are welcome!
 
-If you plan to submit up a pull request, you can expect a timely review.  There aren't any strict requirements around the environment you'll need.  Please ensure you do the following:
-
-  - Configure your IDE or manually run [Black](https://github.com/psf/black) to auto-format the code.
-  - Ensure you run the unit tests in this project!
-    
-Actions are configured in this repo to run against all PRs and merges which will block them if a unit test fails or Black throws an error.
+If you plan to submit up a pull request, you can expect a timely review.  There aren't any strict requirements around the environment you'll need.
 
 # FAQ
 
