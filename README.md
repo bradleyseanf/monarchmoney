@@ -2,6 +2,11 @@
   <img src=".github/assets/monarch-logo.svg" alt="Monarch Money Community logo" />
 </p>
 
+[![Maintenance](https://img.shields.io/maintenance/yes/2026)](https://github.com/bradleyseanf/monarchmoneycommunity/graphs/commit-activity)
+[![Issues](https://img.shields.io/github/issues/bradleyseanf/monarchmoneycommunity)](https://github.com/bradleyseanf/monarchmoneycommunity/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/bradleyseanf/monarchmoneycommunity)](https://github.com/bradleyseanf/monarchmoneycommunity/pulls)
+[![Contributors](https://img.shields.io/github/contributors/bradleyseanf/monarchmoneycommunity)](https://github.com/bradleyseanf/monarchmoneycommunity/graphs/contributors)
+
 > [!WARNING]
 > This project was forked from https://github.com/hammem/monarchmoney and would not be possible without it.
 > The upstream fork is no longer maintained. This fork fixes issues that prevent the library from working today, including the Monarch Money domain change to `api.monarch.com`, auth persistence, and the `get_budget()` GraphQL query.
