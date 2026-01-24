@@ -153,6 +153,7 @@ As of writing this README, the following methods are supported:
 - `delete_account` - deletes an account by the provided account id
 - `update_account` - updates settings and/or balance of the provided account id
 - `upload_account_balance_history` - uploads account history csv file for a given account
+- `upload_attachment` - uploads a binary file for a given transaction by the provided transaction id
 
 # Contributing
 

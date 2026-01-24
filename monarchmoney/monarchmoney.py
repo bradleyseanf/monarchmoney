@@ -3,6 +3,7 @@ import calendar
 import csv
 import getpass
 import json
+import mimetypes
 import os
 import pickle
 import time
@@ -36,6 +37,7 @@ class BalanceHistoryRow:
 
 class MonarchMoneyEndpoints(object):
     BASE_URL = "https://api.monarch.com"
+    CLOUDINARY_BASE_URL = "https://api.cloudinary.com"
 
     @classmethod
     def getLoginEndpoint(cls) -> str:
@@ -48,6 +50,10 @@ class MonarchMoneyEndpoints(object):
     @classmethod
     def getAccountBalanceHistoryUploadEndpoint(cls) -> str:
         return cls.BASE_URL + "/account-balance-history/upload/"
+
+    @classmethod
+    def getAttachmentUploadEndpoint(cls) -> str:
+        return cls.CLOUDINARY_BASE_URL + "/v1_1/monarch-money/image/upload/"
 
 
 class RequireMFAException(Exception):
@@ -2747,6 +2753,206 @@ class MonarchMoney(object):
         )
 
     async def _is_upload_balance_history_complete(self, session_key: str):
+        """
+        Retrieves the status of the upload balance history session.
+
+        :param session_key: The session key for the uploaded file.
+        """
+
+        query = gql(
+            """
+            query Web_GetUploadBalanceHistorySession($sessionKey: String!) {
+                uploadBalanceHistorySession(sessionKey: $sessionKey) {
+                    ...UploadBalanceHistorySessionFields
+                    __typename
+                }
+            }
+            fragment UploadBalanceHistorySessionFields on UploadBalanceHistorySession {
+                sessionKey
+                status
+                __typename
+            }
+            """
+        )
+
+        variables = {"sessionKey": session_key}
+
+        return await self.gql_call(
+            "Web_GetUploadBalanceHistorySession", query, variables
+        )
+
+    async def _get_transaction_attachment_upload_info(self, transaction_id: str):
+        """
+        Retrieves the request parameters to upload the transaction attachment
+        :param transaction_id: The selected transaction id to get the request parameters for
+        """
+
+        query = gql(
+            """
+            mutation Common_GetTransactionAttachmentUploadInfo($transactionId: UUID!) {
+                getTransactionAttachmentUploadInfo(transactionId: $transactionId) {
+                    info {
+                        path
+                        requestParams {
+                            timestamp
+                            folder
+                            signature
+                            api_key
+                            upload_preset
+                            __typename
+                        }
+                        __typename
+                    }
+                    __typename
+                }
+            }
+            """
+        )
+
+        variables = {"transactionId": transaction_id}
+
+        return await self.gql_call(
+            operation="Common_GetTransactionAttachmentUploadInfo",
+            variables=variables,
+            graphql_query=query,
+        )
+
+    async def _add_transaction_attachment(
+        self,
+        transaction_id: str,
+        filename: str,
+        public_id: str,
+        extension: str,
+        size_bytes: int,
+    ):
+        """
+        Adds the attachment to the transaction
+
+        :param transaction_id: The selected transaction id to upload the attachment to.
+        :param filename: The name of the file including the extension name
+        :param public_id: the public id from request params
+        :param extension: the filename extension from request params
+        :param size_bytes: the size of the file from request params
+        """
+
+        query = gql(
+            """
+            mutation Common_AddTransactionAttachment($input: TransactionAddAttachmentMutationInput!) {
+                addTransactionAttachment(input: $input) {
+                    attachment {
+                        id
+                        publicId
+                        extension
+                        sizeBytes
+                        filename
+                        originalAssetUrl
+                        __typename
+                    }
+                    errors {
+                        message
+                        __typename
+                    }
+                    __typename
+                }
+            }
+            """
+        )
+
+        variables = {
+            "input": {
+                "extension": extension,
+                "transactionId": transaction_id,
+                "filename": filename,
+                "publicId": public_id,
+                "sizeBytes": size_bytes,
+            },
+        }
+
+        return await self.gql_call(
+            operation="Common_AddTransactionAttachment",
+            variables=variables,
+            graphql_query=query,
+        )
+
+    async def upload_attachment(
+        self,
+        transaction_id: str,
+        file_content: bytes,
+        filename: str,
+    ):
+        """
+        Uploads an attachment to a transaction
+
+        :param transaction_id: The selected transaction id to upload the attachment to.
+        :param file_content: The binary file content
+        :param filename: The name of the file including the extension name
+        """
+
+        response = await self._get_transaction_attachment_upload_info(
+            transaction_id=transaction_id
+        )
+        upload_request_params = response["getTransactionAttachmentUploadInfo"]["info"][
+            "requestParams"
+        ]
+
+        mime_type, _ = mimetypes.guess_type(filename)
+        mime_type = mime_type or "application/octet-stream"
+
+        form = FormData()
+
+        form.add_field("file", file_content, filename=filename, content_type=mime_type)
+        form.add_field("timestamp", str(upload_request_params["timestamp"]))
+        form.add_field("folder", upload_request_params["folder"])
+        form.add_field("signature", upload_request_params["signature"])
+        form.add_field("api_key", upload_request_params["api_key"])
+        form.add_field("upload_preset", upload_request_params["upload_preset"])
+
+        upload_response = await self._upload_form_data(
+            url=MonarchMoneyEndpoints.getAttachmentUploadEndpoint(),
+            data=form,
+        )
+
+        return await self._add_transaction_attachment(
+            transaction_id=transaction_id,
+            filename=filename,
+            public_id=upload_response["public_id"],
+            extension=upload_response["format"],
+            size_bytes=upload_response["bytes"],
+        )
+
+    async def _initiate_upload_attachment_session(self, session_key: str) -> dict:
+        """
+        Triggers parsing of the uploaded balance history CSV file.
+
+        :param session_key: The session key for the uploaded file.
+        """
+
+        query = gql(
+            """
+            mutation Web_ParseUploadBalanceHistorySession($input: ParseBalanceHistoryInput!) {
+                parseBalanceHistory(input: $input) {
+                    uploadBalanceHistorySession {
+                        ...UploadBalanceHistorySessionFields
+                        __typename
+                    }
+                    __typename
+                }
+            }
+            fragment UploadBalanceHistorySessionFields on UploadBalanceHistorySession {
+                sessionKey
+                status
+                __typename
+            }
+            """
+        )
+
+        variables = {"input": {"sessionKey": session_key}}
+
+        return await self.gql_call(
+            "Web_ParseUploadBalanceHistorySession", query, variables
+        )
+
+    async def _is_upload_attachment_complete(self, session_key: str):
         """
         Retrieves the status of the upload balance history session.
 
