@@ -17,10 +17,46 @@ async def process_transaction(file: UploadFile, db: AsyncSession):
     existing = result.scalar_one_or_none()
     
     if existing:
+        print(f"DUPLICATE TRANSACTION DETECTED: Hash={image_hash}")
+        print(f"Existing Data: {existing.parsed_data}")
         return {"status": "duplicate", "data": existing.parsed_data}
     
     # 3. OCR Extraction
     data = extract_transaction_data(content)
+    
+    # LOGGING FOR VISIBILITY
+    print(f"\n\n--- EXTRACTED DATA ---\n{data}\n------------------------\n\n")
+    
+    
+    # 3b. Currency Conversion
+    
+    # 3b. Currency Conversion
+    raw_currency = str(data.get("currency", "")).upper().strip()
+    print(f"Currency detection: Raw='{data.get('currency')}' Normalized='{raw_currency}'")
+    
+    if raw_currency in ["EUR", "EURO", "€"]:
+        try:
+            from .currency import get_eur_to_usd_rate
+            rate = await get_eur_to_usd_rate(data["date"])
+            original_amount = data["amount"]
+            converted_amount = round(original_amount * rate, 2)
+            
+            print(f"Converting EUR {original_amount} to USD {converted_amount} (Rate: {rate})")
+            
+            # Update data for Monarch
+            data["original_amount"] = original_amount
+            data["original_currency"] = "EUR"
+            data["amount"] = converted_amount
+            data["currency"] = "USD" # Make it appear as USD to Monarch wrapper
+            data["exchange_rate"] = rate
+        except Exception as e:
+             print(f"Conversion failed, proceeding with original currency: {e}")
+    else:
+        print(f"Skipping conversion: '{raw_currency}' is not EUR.")
+
+    # Log final payload
+    print(f"FINAL PAYLOAD TO MONARCH: {data}")
+
     if not data or "error" in data:
         error_msg = data.get("error", "Unknown OCR error") if data else "Empty OCR response"
         # If OCR fails, we shouldn't save the hash maybe? OR save it as failed?

@@ -10,7 +10,9 @@ _SESSION_FILE_ = ".mm/mm_session.pickle"
 def main() -> None:
     # Use session file
     mm = MonarchMoney(session_file=_SESSION_FILE_)
+    print("Attempting to login...")
     asyncio.run(mm.interactive_login())
+    print("Login successful")
 
     # Subscription details
     subs = asyncio.run(mm.get_subscription_details())

@@ -14,7 +14,7 @@ def extract_transaction_data(image_bytes: bytes) -> dict:
         # Fallback for testing or if key missing
         return {"error": "GEMINI_API_KEY not set"}
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-3-flash-preview")
     
     # Prompt engineering
     prompt = """

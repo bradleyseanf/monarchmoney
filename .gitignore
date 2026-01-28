@@ -26,3 +26,16 @@ MANIFEST
 .coverage
 coverage.xml
 htmlcov/
+
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+npm_output.log
+
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local

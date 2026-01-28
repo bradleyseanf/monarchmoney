@@ -41,21 +41,35 @@ async def handle_share(
     """
     try:
         result = await process_transaction(file, db)
+        if result.get("status") == "duplicate":
+            # Extract nested data
+            data = result.get("data", {})
+            title_class = "duplicate" # We'll reuse error style or create new one
+            title_text = "⚠️ Already Processed"
+            bg_color = "#fff3cd" # Yellow-ish
+            title_color = "#856404"
+        else:
+            data = result
+            title_class = "success"
+            title_text = "✅ Transaction Processed"
+            bg_color = "#f0f2f5"
+            title_color = "green"
+
         return HTMLResponse(content=f"""
         <html>
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <style>
-                    body {{ font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5; }}
+                    body {{ font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: {bg_color}; }}
                     .card {{ background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }}
-                    .success {{ color: green; font-weight: bold; font-size: 1.2rem; }}
+                    .title {{ font-weight: bold; font-size: 1.2rem; margin-bottom: 1rem; color: {title_color}; }}
                 </style>
             </head>
             <body>
                 <div class="card">
-                    <p class="success">✅ Transaction Processed</p>
-                    <p>Amount: {result.get('amount')} {result.get('currency')}</p>
-                    <p>Merchant: {result.get('merchant')}</p>
+                    <p class="title">{title_text}</p>
+                    <p>Amount: {data.get('amount')} {data.get('currency')}</p>
+                    <p>Merchant: {data.get('merchant')}</p>
                     <a href="/">Back to Home</a>
                 </div>
             </body>
