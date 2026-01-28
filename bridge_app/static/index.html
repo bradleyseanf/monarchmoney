@@ -1,45 +1,134 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Monarch Bridge</title>
+    <title>💶 Monarch Noney Bridge</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon.png">
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
     </script>
     <style>
-        body { font-family: sans-serif; padding: 2rem; text-align: center; }
-        .btn { background: #000; color: #fff; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; display: inline-block; margin-top: 1rem; cursor: pointer; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #4a4a4a;
+        }
+
+        .btn {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: #fff;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        input[type="file"] {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Loading Animation Styles */
+        #loadingOverlay {
+            background: rgba(20, 20, 30, 0.95) !important;
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .bouncer {
+            font-size: 4rem;
+            animation: bounce 1s infinite alternate;
+        }
+
+        #loadingOverlay h3 {
+            color: #fff !important;
+        }
+
+        #loadingOverlay p {
+            color: #ccc !important;
+        }
+
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
     </style>
 </head>
+
 <body>
-    <h1>Monarch Euro Bridge</h1>
-    <p>Install this app to your Android device to share receipts directly to Monarch Money.</p>
-    
-    <div style="margin-top: 2rem; border: 1px dashed #ccc; padding: 1rem;">
-        <h3>Manual Upload</h3>
-        <form action="/share" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" accept="image/*">
-            <br><br>
-            <button type="submit" class="btn">Upload</button>
-        </form>
-    </div>
-    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:1000; justify-content:center; align-items:center; flex-direction:column;">
-        <div style="border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;"></div>
-        <h3 style="margin-top: 20px; color: #333;">Processing Receipt...</h3>
-        <p style="color: #666;">This may take a few seconds.</p>
+    <div class="container">
+        <h1>💶 MM Euro Bridge 💶</h1>
+        <p style="color: #666; line-height: 1.6;">Share a receipt image to automatically parse and sync it to Monarch
+            Money.</p>
+
+        <div style="margin-top: 2rem;">
+            <form action="/share" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required>
+                <br>
+                <button type="submit" class="btn">🚀 Upload Receipt</button>
+            </form>
+        </div>
     </div>
 
-    <style>
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+    <div id="loadingOverlay"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:1000; justify-content:center; align-items:center; flex-direction:column;">
+        <div class="bouncer">🧾</div>
+        <h3 style="margin-top: 20px; color: #333;">Crunching the numbers...</h3>
+        <p style="color: #666;">Our AI elves are reading your receipt! 🧙‍♂️</p>
+    </div>
 
     <script>
-        document.querySelector('form').onsubmit = function() {
+        document.querySelector('form').onsubmit = function () {
             document.getElementById('loadingOverlay').style.display = 'flex';
         };
     </script>
 </body>
+
 </html>

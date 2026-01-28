@@ -59,19 +59,79 @@ async def handle_share(
         <html>
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>Monarch Money Bridge Result</title>
+                <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
                 <style>
-                    body {{ font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: {bg_color}; }}
-                    .card {{ background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }}
-                    .title {{ font-weight: bold; font-size: 1.2rem; margin-bottom: 1rem; color: {title_color}; }}
+                    body {{ 
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                        padding: 2rem; 
+                        text-align: center; 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        min-height: 100vh;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0;
+                        color: #333;
+                    }}
+                    .card {{ 
+                        background: rgba(255, 255, 255, 0.95);
+                        padding: 2.5rem;
+                        border-radius: 20px;
+                        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                        max-width: 400px;
+                        width: 100%;
+                        backdrop-filter: blur(10px);
+                    }}
+                    .title {{ font-weight: bold; font-size: 1.5rem; margin-bottom: 1rem; color: {title_color}; }}
+                    .btn {{ 
+                        background: linear-gradient(to right, #667eea, #764ba2); 
+                        color: #fff; 
+                        padding: 0.8rem 2rem; 
+                        border-radius: 50px; 
+                        text-decoration: none; 
+                        display: inline-block; 
+                        margin-top: 1.5rem; 
+                        cursor: pointer; 
+                        border: none;
+                        font-size: 1rem;
+                        font-weight: bold;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        transition: transform 0.2s;
+                    }}
+                    .btn:hover {{ transform: translateY(-2px); }}
+                    .detail-row {{ display: flex; justify-content: space-between; margin: 0.5rem auto; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; max-width: 260px; }}
+                    .label {{ color: #666; }}
+                    .value {{ font-weight: 600; }}
                 </style>
             </head>
             <body>
                 <div class="card">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">{ "🎉" if title_class == "success" else "⚠️" }</div>
                     <p class="title">{title_text}</p>
-                    <p>Amount: {data.get('amount')} {data.get('currency')}</p>
-                    <p>Merchant: {data.get('merchant')}</p>
-                    <a href="/">Back to Home</a>
+                    
+                    <div class="detail-row">
+                        <span class="label">Amount</span>
+                        <span class="value">{data.get('amount')} {data.get('currency')}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Merchant</span>
+                        <span class="value">{data.get('merchant')}</span>
+                    </div>
+                    
+                    <a href="/" class="btn">Process Another</a>
                 </div>
+
+                <script>
+                    if ("{title_class}" === "success") {{
+                        confetti({{
+                            particleCount: 100,
+                            spread: 70,
+                            origin: {{ y: 0.6 }}
+                        }});
+                    }}
+                </script>
             </body>
         </html>
         """)
@@ -81,16 +141,51 @@ async def handle_share(
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                  <style>
-                    body {{ font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #fff1f0; }}
-                    .card {{ background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }}
-                    .error {{ color: red; font-weight: bold; font-size: 1.2rem; }}
+                    body {{ 
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                        padding: 2rem; 
+                        text-align: center; 
+                        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+                        min-height: 100vh;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0;
+                        color: #333;
+                    }}
+                    .card {{ 
+                        background: rgba(255, 255, 255, 0.95);
+                        padding: 2.5rem;
+                        border-radius: 20px;
+                        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                        max-width: 400px;
+                        width: 100%;
+                        backdrop-filter: blur(10px);
+                    }}
+                    .error {{ color: #e53e3e; font-weight: bold; font-size: 1.5rem; }}
+                    .btn {{ 
+                         background: linear-gradient(to right, #ff9a9e, #fad0c4); 
+                        color: #fff; 
+                        padding: 0.8rem 2rem; 
+                        border-radius: 50px; 
+                        text-decoration: none; 
+                        display: inline-block; 
+                        margin-top: 1.5rem; 
+                        cursor: pointer; 
+                        border: none;
+                        font-size: 1rem;
+                        font-weight: bold;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    }}
                 </style>
             </head>
             <body>
                 <div class="card">
-                    <p class="error">❌ Failed</p>
-                    <p>{str(e)}</p>
-                    <a href="/">Try Again</a>
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🤧</div>
+                    <p class="error">Oops! Something went wrong.</p>
+                    <p style="color: #666; margin: 1rem 0;">{str(e)}</p>
+                    <a href="/" class="btn">Try Again</a>
                 </div>
             </body>
         </html>
